@@ -10,6 +10,8 @@ against. PhysiCell changes its defaults and its rules grammar between
 releases, so a model built for a different version may read differently --
 check `pyphysicell.PHYSICELL_VERSION` before trusting a comparison.
 
+**Developed and maintained by:** Daniel Mejia.
+
 **Supported by:** the Network for Computational Nanotechnology and
 [nanoHUB](https://nanohub.org), Purdue University.
 
@@ -309,8 +311,9 @@ it; please do not send them bug reports about it.
 
 ## Acknowledgements
 
-This work is supported and maintained by the **Network for Computational
-Nanotechnology** and **[nanoHUB](https://nanohub.org)**, Purdue University.
+pyphysicell is developed and maintained by **Daniel Mejia**, with support from
+the **Network for Computational Nanotechnology** and
+**[nanoHUB](https://nanohub.org)**, Purdue University.
 
 The PhysiCell project itself has been supported by the National Science
 Foundation, the National Cancer Institute, the Breast Cancer Research
