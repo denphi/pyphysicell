@@ -50,3 +50,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with: {path: dist, merge-multiple: true}
       - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # 0.1.0's sdist and macOS wheels were uploaded from a laptop; this
+          # lets a later run add the Linux and Windows wheels to the same
+          # release instead of failing on the files already there.
+          skip-existing: true
