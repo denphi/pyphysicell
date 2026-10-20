@@ -18,3 +18,6 @@ tests/ref_dict
 tests/ref_models
 tests/ref_values
 tests/biofvm_ref
+
+# scratch: the rule-importance study, kept locally
+experiments/

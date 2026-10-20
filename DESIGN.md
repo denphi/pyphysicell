@@ -558,7 +558,7 @@ The same rule applies to any default duration the library picks on a user's beha
 result. Answering it is N+1 runs, which the file-driven workflow makes expensive enough that nobody
 does it. Here a rule is data and a simulation is an object, so it is a loop over `model.rules`.
 
-**What was measured** (`experiments/`, 100 rule-measurements over 5 models and 2 horizons, with
+**What was measured** (100 rule-measurements over 5 models and 2 horizons, with
 sham knock-outs as controls): a published ruleset is mostly inert — 39 of 100 measurements moved any
 reported outcome — and **the inert set shrinks as the window grows**: 8 rules gained and 0 lost
 between the short and the 1440-minute horizon. Rules written for cell types that only exist after a
