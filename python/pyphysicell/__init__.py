@@ -28,7 +28,7 @@ __all__ = [
     "DeathModel", "Interactions", "Mechanics", "ParameterDistribution", "SaveOptions", "SecretionEntry",
     "check", "codegen", "fibres", "initial", "membrane", "inspect", "load", "ports", "standard", "viz3d", "read_cells_csv", "read_rules_csv", "read_xml", "scenarios", "write_cells_csv",
 ]
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 #: the PhysiCell release this library reimplements and is tested against
 PHYSICELL_VERSION = "1.14.2"

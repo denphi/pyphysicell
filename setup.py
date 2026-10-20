@@ -10,6 +10,8 @@ OpenMP is deliberately *not* enabled in the wheels. The kernels carry their own
 std::thread pool, so a wheel built this way needs no libomp beside it on any
 platform -- which is the difference between `pip install` working and not.
 """
+import os
+
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
@@ -20,14 +22,25 @@ FLAGS = {
 
 
 class BuildKernels(build_ext):
-    """Build the kernels if we can, and install anyway if we cannot.
+    """Build the kernels, with two Windows-specific corrections.
 
-    An sdist install on a machine with no C++ toolchain would otherwise fail
-    at build time. It does not need to: `pyphysicell._kernels` falls back to
-    compiling on first import, and reports a clear error there if the compiler
-    really is missing. Failing late with a good message beats failing `pip
-    install` with a compiler traceback.
+    setuptools assumes every Extension is an importable module and adds
+    /EXPORT:PyInit_<name> to the MSVC link line. These kernels have no
+    PyInit_ -- they are a plain shared library loaded with ctypes -- so the
+    link fails with an unresolved external. `get_export_symbols` returning
+    nothing is the documented way out; __declspec(dllexport) in the source
+    already exports what we call.
+
+    That failure used to be swallowed so an sdist install could continue
+    without a compiler. It should not be: a wheel whose kernels did not build
+    is broken, and the silence cost a CI round trip in which a 32-bit MinGW
+    fallback DLL reached 64-bit Python (WinError 193). Set
+    PYPHYSICELL_OPTIONAL_KERNELS=1 to install anyway and compile on first
+    import.
     """
+
+    def get_export_symbols(self, ext):
+        return []
 
     def build_extensions(self):
         flags = FLAGS.get(self.compiler.compiler_type, FLAGS["unix"])
@@ -36,6 +49,8 @@ class BuildKernels(build_ext):
         try:
             super().build_extensions()
         except Exception as exc:                                  # noqa: BLE001
+            if not os.environ.get("PYPHYSICELL_OPTIONAL_KERNELS"):
+                raise
             print(f"\n*** pyphysicell: could not prebuild the kernels ({exc}).\n"
                   f"*** Installing anyway; they will be compiled on first import.\n")
 

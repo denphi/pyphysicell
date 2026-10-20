@@ -93,9 +93,22 @@ _U = POINTER(c_ubyte)
 def _load():
     shipped = _prebuilt()
     if shipped is not None:
-        lib_path, tag = shipped, "prebuilt"
-    else:
-        lib_path, tag = _build()
+        try:
+            return _bind(shipped, "prebuilt")
+        except OSError as exc:
+            # a shipped binary that will not load (wrong architecture, a
+            # truncated link) must not be fatal: fall back to source and say
+            # what happened if that fails too
+            try:
+                return _bind(*_build())
+            except Exception as second:                           # noqa: BLE001
+                raise OSError(f"the kernels shipped with this install would not load "
+                              f"({shipped.name}: {exc}), and rebuilding them from "
+                              f"source failed too: {second}") from exc
+    return _bind(*_build())
+
+
+def _bind(lib_path, tag):
     lib = ctypes.CDLL(str(lib_path))
 
     lib.pc_has_openmp.restype = c_int
