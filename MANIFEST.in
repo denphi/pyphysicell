@@ -1,0 +1,6 @@
+include LICENSE README.md DESIGN.md
+include python/pyphysicell/kernels.cpp
+recursive-exclude notebooks *
+recursive-exclude tests *
+recursive-exclude tools *
+prune .github

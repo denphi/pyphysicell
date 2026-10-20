@@ -17,14 +17,15 @@ jobs:
         include:
           - {os: ubuntu-latest,  arch: x86_64}
           - {os: ubuntu-24.04-arm, arch: aarch64}
-          - {os: macos-13,       arch: x86_64}   # Intel runner
-          - {os: macos-14,       arch: arm64}    # Apple silicon runner
+          - {os: macos-13,       arch: x86_64, target: "10.15"}  # Intel runner
+          - {os: macos-14,       arch: arm64,  target: "11.0"}   # Apple silicon runner
           - {os: windows-latest, arch: AMD64}
     steps:
       - uses: actions/checkout@v4
       - uses: pypa/cibuildwheel@v2.21.3
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
+          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.target }}
       - uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.arch }}

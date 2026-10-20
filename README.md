@@ -1,8 +1,14 @@
 # pyphysicell: PhysiCell models in Python, with C++ only as computation kernels
 
-**Version:** 0.1.0.dev0
+**Version:** 0.1.0
 
-**Release date:** unreleased
+**Release date:** 20 October 2026
+
+**Based on:** PhysiCell **1.14.2** (and the BioFVM vendored in it). This is the
+version every algorithm, default value and parity test here was written
+against. PhysiCell changes its defaults and its rules grammar between
+releases, so a model built for a different version may read differently --
+check `pyphysicell.PHYSICELL_VERSION` before trusting a comparison.
 
 **Supported by:** the Network for Computational Nanotechnology and
 [nanoHUB](https://nanohub.org), Purdue University.
@@ -30,11 +36,13 @@ process, and C++ is kept for the inner loops only -- diffusion, mechanics,
 forces -- reached through ctypes over NumPy buffers. No project is compiled,
 no executable is built, no output folder is parsed.
 
-**This is not PhysiCell and not an official PhysiCell product.** It is a
-reimplementation whose microenvironment matches BioFVM to 4.6e-14 and whose
-model parsing matches PhysiCell on 5,826 values across 17 projects, but whose
-agent-side trajectories have never been compared against a compiled PhysiCell
-run. See *What is verified* below, and cite the PhysiCell papers, not this.
+**This is not PhysiCell and not an official PhysiCell product.** It tracks one
+specific release, **PhysiCell 1.14.2**: its microenvironment matches that
+version's BioFVM to 4.6e-14 and its model parsing matches that version on
+5,826 values across 17 projects, but its agent-side trajectories have never
+been compared against a compiled PhysiCell run, of any version. Nothing here
+is guaranteed against 1.13 or earlier, or against a later release. See *What
+is verified* below, and cite the PhysiCell papers, not this.
 
 ```python
 import pyphysicell as pc
