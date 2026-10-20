@@ -1,0 +1,29 @@
+x,y,z,type
+0.0,0.0,0.0,tumor cell
+15.0,0.0,0.0,macrophage
+100.0,0.0,0.0,tumor cell
+115.0,0.0,0.0,macrophage
+100.0,100.0,0.0,fast T cell
+115.0,100.0,0.0,tumor cell
+107.5,113.0,0.0,tumor cell
+107.5,87.0,0.0,tumor cell
+100.0,115.0,0.0,tumor cell
+100.0,85.0,0.0,tumor cell
+92.5,113.0,0.0,tumor cell
+92.5,87.0,0.0,tumor cell
+85.0,100.0,0.0,tumor cell
+-100.0,100.0,0.0,tumor cell
+-100.0,85.0,0.0,fast T cell
+-100.0,115.0,0.0,fast T cell
+-115.0,100.0,0.0,fast T cell
+-85.0,100.0,0.0,fast T cell
+0.0,-100.0,0.0,tumor cell
+-100.0,-100.0,0.0,slow T cell
+-115.0,-100.0,0.0,tumor cell
+-107.5,-113.0,0.0,tumor cell
+-107.5,-87.0,0.0,tumor cell
+-100.0,-115.0,0.0,tumor cell
+-100.0,-85.0,0.0,tumor cell
+-92.5,-113.0,0.0,tumor cell
+-92.5,-87.0,0.0,tumor cell
+-85.0,-100.0,0.0,tumor cell

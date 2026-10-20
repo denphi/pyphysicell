@@ -1,0 +1,234 @@
+{
+ "name": "rules_sample",
+ "until": 1440.0,
+ "reps": 3,
+ "base_reps": 6,
+ "baseline": {
+  "births": 18.333333333333332,
+  "dead": 225.5,
+  "deaths": 351.0,
+  "live:M0 macrophage": 111.16666666666667,
+  "live:M1 macrophage": 35.833333333333336,
+  "live:M2 macrophage": 3.0,
+  "live:effector T cell": 150.0,
+  "live:exhausted T cell": 0.0,
+  "live:malignant epithelial cell": 706.8333333333334,
+  "sub:anti-inflammatory factor": 0.019828766998309155,
+  "sub:apoptotic debris": 0.0027601979860823935,
+  "sub:necrotic debris": 0.1072388071551264,
+  "sub:oxygen": 13.148231012463247,
+  "sub:pro-inflammatory factor": 0.14806509675747023
+ },
+ "baseline_sd": {
+  "births": 3.7237973450050514,
+  "dead": 10.310189135025603,
+  "deaths": 14.268847185389575,
+  "live:M0 macrophage": 6.493586579592719,
+  "live:M1 macrophage": 7.440878084384038,
+  "live:M2 macrophage": 1.7888543819998317,
+  "live:effector T cell": 0.0,
+  "live:exhausted T cell": 0.0,
+  "live:malignant epithelial cell": 13.197221929886101,
+  "sub:anti-inflammatory factor": 0.011250474279061198,
+  "sub:apoptotic debris": 0.000256416802196005,
+  "sub:necrotic debris": 0.0037733794997290428,
+  "sub:oxygen": 0.021460992459649757,
+  "sub:pro-inflammatory factor": 0.02352903166770312
+ },
+ "sham_z": [
+  1.0507405045102929,
+  0.9860795503865809,
+  1.5973514800474302
+ ],
+ "rows": [
+  {
+   "i": 0,
+   "z": 52.77625879903735,
+   "worst": "live:malignant epithelial cell",
+   "D": 0.6876648754870054,
+   "rule": "malignant epithelial cell | oxygen decreases necrosis"
+  },
+  {
+   "i": 1,
+   "z": 4.296689244236596,
+   "worst": "births",
+   "D": 0.0006478560713766367,
+   "rule": "malignant epithelial cell | oxygen increases cycle entry"
+  },
+  {
+   "i": 2,
+   "z": 3.128840681937158,
+   "worst": "births",
+   "D": 0.011333506457194085,
+   "rule": "malignant epithelial cell | pressure decreases cycle entry"
+  },
+  {
+   "i": 3,
+   "z": 10.764497343557455,
+   "worst": "sub:apoptotic debris",
+   "D": 0.018174546745427476,
+   "rule": "malignant epithelial cell | apoptotic increases apoptotic debris secretion"
+  },
+  {
+   "i": 4,
+   "z": 28.419830860592466,
+   "worst": "sub:necrotic debris",
+   "D": 0.11942321363896416,
+   "rule": "malignant epithelial cell | necrotic increases necrotic debris secretion"
+  },
+  {
+   "i": 5,
+   "z": 4.542432027190648,
+   "worst": "dead",
+   "D": 0.4735272748381342,
+   "rule": "malignant epithelial cell | oxygen decreases migration speed"
+  },
+  {
+   "i": 6,
+   "z": 2.1834753747402798,
+   "worst": "deaths",
+   "D": 0.00012769896270892835,
+   "rule": "malignant epithelial cell | damage increases apoptosis"
+  },
+  {
+   "i": 7,
+   "z": 6.2928682679581005,
+   "worst": "sub:pro-inflammatory factor",
+   "D": 0.0003240378107261285,
+   "rule": "M0 macrophage | necrotic debris increases transform to M1 macrophage"
+  },
+  {
+   "i": 8,
+   "z": 0.7475492958946746,
+   "worst": "deaths",
+   "D": 7.985854276161803e-05,
+   "rule": "M0 macrophage | apoptotic debris decreases migration speed"
+  },
+  {
+   "i": 9,
+   "z": 1.1985757817763179,
+   "worst": "sub:anti-inflammatory factor",
+   "D": 0.0002550434084147826,
+   "rule": "M0 macrophage | necrotic debris decreases migration speed"
+  },
+  {
+   "i": 10,
+   "z": 1.0523203547956572,
+   "worst": "live:M0 macrophage",
+   "D": 0.003815758382521162,
+   "rule": "M0 macrophage | volume decreases phagocytose apoptotic cell"
+  },
+  {
+   "i": 11,
+   "z": 1.0745333246725546,
+   "worst": "sub:pro-inflammatory factor",
+   "D": 0.003815758382521162,
+   "rule": "M0 macrophage | volume decreases phagocytose necrotic cell"
+  },
+  {
+   "i": 12,
+   "z": 3.334694458437293,
+   "worst": "sub:anti-inflammatory factor",
+   "D": 0.0073876125962896175,
+   "rule": "M1 macrophage | oxygen decreases transform to M2 macrophage"
+  },
+  {
+   "i": 13,
+   "z": 0.7630062902245608,
+   "worst": "dead",
+   "D": 4.1568123495489306e-05,
+   "rule": "M1 macrophage | apoptotic debris decreases migration speed"
+  },
+  {
+   "i": 14,
+   "z": 1.1329332082584924,
+   "worst": "sub:necrotic debris",
+   "D": 0.0015478717982988217,
+   "rule": "M1 macrophage | necrotic debris decreases migration speed"
+  },
+  {
+   "i": 15,
+   "z": 0.7956568536259838,
+   "worst": "live:M0 macrophage",
+   "D": 0.0007171785966894273,
+   "rule": "M1 macrophage | volume decreases phagocytose apoptotic cell"
+  },
+  {
+   "i": 16,
+   "z": 1.3417147980669892,
+   "worst": "dead",
+   "D": 0.0007171785966894273,
+   "rule": "M1 macrophage | volume decreases phagocytose necrotic cell"
+  },
+  {
+   "i": 17,
+   "z": 1.2103559964516404,
+   "worst": "sub:apoptotic debris",
+   "D": 1.0974383095183642e-09,
+   "rule": "M2 macrophage | apoptotic debris decreases migration speed"
+  },
+  {
+   "i": 18,
+   "z": 0.7274357338917407,
+   "worst": "dead",
+   "D": 0.00014571812419628786,
+   "rule": "M2 macrophage | necrotic debris decreases migration speed"
+  },
+  {
+   "i": 19,
+   "z": 0.74432415339205,
+   "worst": "live:M0 macrophage",
+   "D": 6.302678942484428e-05,
+   "rule": "M2 macrophage | volume decreases phagocytose apoptotic cell"
+  },
+  {
+   "i": 20,
+   "z": 0.9493337606292951,
+   "worst": "sub:anti-inflammatory factor",
+   "D": 6.302678942484428e-05,
+   "rule": "M2 macrophage | volume decreases phagocytose necrotic cell"
+  },
+  {
+   "i": 21,
+   "z": 0.8966533560018253,
+   "worst": "live:malignant epithelial cell",
+   "D": 0.0,
+   "rule": "effector T cell | pro-inflammatory factor increases attack malignant epithelial cell"
+  },
+  {
+   "i": 22,
+   "z": 10.850541411640219,
+   "worst": "sub:necrotic debris",
+   "D": 0.06420746089371646,
+   "rule": "effector T cell | contact with malignant epithelial cell decreases migration speed"
+  },
+  {
+   "i": 23,
+   "z": 1.9155950707300988,
+   "worst": "deaths",
+   "D": 0.01441138125709446,
+   "rule": "effector T cell | pro-inflammatory factor increases migration speed"
+  },
+  {
+   "i": 24,
+   "z": 0.7956568536259838,
+   "worst": "live:M0 macrophage",
+   "D": 4.8500866945804384e-05,
+   "rule": "effector T cell | anti-inflammatory factor increases transform to exhausted T cell"
+  },
+  {
+   "i": 25,
+   "z": 0.7956568536259838,
+   "worst": "live:M0 macrophage",
+   "D": 0.0,
+   "rule": "exhausted T cell | anti-inflammatory factor decreases migration speed"
+  },
+  {
+   "i": 26,
+   "z": 0.7956568536259838,
+   "worst": "live:M0 macrophage",
+   "D": 0.0,
+   "rule": "exhausted T cell | contact with malignant epithelial cell decreases migration speed"
+  }
+ ]
+}

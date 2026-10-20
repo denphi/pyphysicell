@@ -1,0 +1,20 @@
+.venv/
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.py[cod]
+*.so
+*.dylib
+*.dll
+*.pyd
+.ipynb_checkpoints/
+output/
+notebooks/.run_results
+.DS_Store
+
+# compiled PhysiCell/BioFVM oracles, built on demand by the parity tests
+tests/ref_dict
+tests/ref_models
+tests/ref_values
+tests/biofvm_ref

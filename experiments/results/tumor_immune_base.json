@@ -1,0 +1,114 @@
+{
+ "name": "tumor_immune_base",
+ "until": 240.0,
+ "reps": 4,
+ "base_reps": 8,
+ "baseline": {
+  "births": 108.5,
+  "dead": 198.25,
+  "deaths": 198.5,
+  "live:CD8 T cell": 100.0,
+  "live:macrophage": 100.0,
+  "live:tumor": 1910.125,
+  "sub:anti-inflammatory factor": 0.01981478436640389,
+  "sub:debris": 0.018662408557115727,
+  "sub:oxygen": 22.82705365751871,
+  "sub:pro-inflammatory factor": 0.17373659614870166
+ },
+ "baseline_sd": {
+  "births": 7.151423434733616,
+  "dead": 9.953463144626024,
+  "deaths": 10.0,
+  "live:CD8 T cell": 0.0,
+  "live:macrophage": 0.0,
+  "live:tumor": 14.22711194465392,
+  "sub:anti-inflammatory factor": 0.004713384161102884,
+  "sub:debris": 0.000983029605411215,
+  "sub:oxygen": 0.030394451790119053,
+  "sub:pro-inflammatory factor": 0.002802472006122366
+ },
+ "sham_z": [
+  0.7317524590878556,
+  1.0570090071693397,
+  1.8616281424224712
+ ],
+ "rows": [
+  {
+   "i": 0,
+   "z": 11.256500294615622,
+   "worst": "births",
+   "D": 0.0017182037882841432,
+   "rule": "tumor | oxygen increases cycle entry"
+  },
+  {
+   "i": 1,
+   "z": 24.971214728508127,
+   "worst": "births",
+   "D": 0.09830088380834658,
+   "rule": "tumor | pressure decreases cycle entry"
+  },
+  {
+   "i": 2,
+   "z": 30.804737670049132,
+   "worst": "live:tumor",
+   "D": 0.7703842686190036,
+   "rule": "tumor | oxygen decreases necrosis"
+  },
+  {
+   "i": 3,
+   "z": 0.49195203505947555,
+   "worst": "sub:anti-inflammatory factor",
+   "D": 0.0,
+   "rule": "tumor | damage increases apoptosis"
+  },
+  {
+   "i": 4,
+   "z": 18.984584446273093,
+   "worst": "sub:debris",
+   "D": 0.051348271928021265,
+   "rule": "tumor | dead increases debris secretion"
+  },
+  {
+   "i": 5,
+   "z": 50.0,
+   "worst": "sub:pro-inflammatory factor",
+   "D": 0.04461592937001296,
+   "rule": "macrophage | oxygen increases pro-inflammatory factor secretion"
+  },
+  {
+   "i": 6,
+   "z": 33.38765040500996,
+   "worst": "sub:anti-inflammatory factor",
+   "D": 0.04461592937001296,
+   "rule": "macrophage | oxygen decreases anti-inflammatory factor secretion"
+  },
+  {
+   "i": 7,
+   "z": 0.49195203505947555,
+   "worst": "sub:anti-inflammatory factor",
+   "D": 2.389613535003103e-08,
+   "rule": "CD8 T cell | anti-inflammatory factor decreases attack tumor"
+  },
+  {
+   "i": 8,
+   "z": 0.49195203505947555,
+   "worst": "sub:anti-inflammatory factor",
+   "D": 0.019981878124215067,
+   "rule": "CD8 T cell | pro-inflammatory factor increases attack tumor"
+  },
+  {
+   "i": 9,
+   "z": 0.491945352450216,
+   "worst": "sub:anti-inflammatory factor",
+   "D": 3.347098036835751e-08,
+   "rule": "CD8 T cell | anti-inflammatory factor decreases migration speed"
+  },
+  {
+   "i": 10,
+   "z": 0.5254783720194244,
+   "worst": "sub:anti-inflammatory factor",
+   "D": 0.0,
+   "rule": "CD8 T cell | contact with tumor decreases migration speed"
+  }
+ ]
+}

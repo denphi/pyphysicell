@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyphysicell"
+version = "0.1.0.dev0"
+description = "An independent Python reimplementation of PhysiCell, with C++ computation kernels"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "BSD-3-Clause"}
+authors = [{name = "Daniel Mejia", email = "dmejiapa@purdue.edu"}]
+keywords = ["agent-based-modeling", "systems-biology", "physicell", "biofvm",
+            "multicellular", "simulation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = ["numpy>=1.24"]
+
+[project.urls]
+Homepage = "https://github.com/denphi/pyphysicell"
+Source = "https://github.com/denphi/pyphysicell"
+Issues = "https://github.com/denphi/pyphysicell/issues"
+
+[project.optional-dependencies]
+notebooks = ["matplotlib>=3.7", "pandas>=2.0", "jupyterlab>=4"]
+dev = ["pytest>=7", "nbconvert>=7", "nbclient>=0.9"]
+
+[tool.setuptools]
+package-dir = {"" = "python"}
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.setuptools.package-data]
+pyphysicell = ["kernels.cpp"]
+
+[tool.cibuildwheel]
+# the kernels are C++17 with no third-party dependency, so every wheel is the
+# same build; 3.10 is the floor and PyPy has no ctypes advantage here
+build = "cp310-* cp311-* cp312-* cp313-*"
+skip = "*-musllinux_i686 *_i686 *-win32"
+test-requires = "pytest numpy"
+test-command = "python -c \"import pyphysicell, pyphysicell._kernels as k; print(k.BACKEND, k.MAX_THREADS); assert k.BUILD_TAG == 'prebuilt', k.BUILD_TAG\""
+
+[tool.cibuildwheel.linux]
+archs = ["x86_64", "aarch64"]
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
+
+[tool.cibuildwheel.windows]
+archs = ["AMD64"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

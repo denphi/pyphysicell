@@ -1,0 +1,85 @@
+{
+ "name": "hypoxia",
+ "until": 1440.0,
+ "reps": 3,
+ "base_reps": 6,
+ "baseline": {
+  "births": 281.8333333333333,
+  "dead": 359.3333333333333,
+  "deaths": 446.3333333333333,
+  "live:motile tumor": 260.6666666666667,
+  "live:tumor": 1574.8333333333333,
+  "sub:oxygen": 23.23917636058913
+ },
+ "baseline_sd": {
+  "births": 11.461529857164212,
+  "dead": 14.348054455802245,
+  "deaths": 18.50045044496665,
+  "live:motile tumor": 13.559744343705992,
+  "live:tumor": 6.853223086013373,
+  "sub:oxygen": 0.042358062940541535
+ },
+ "sham_z": [
+  0.8992662045253714,
+  0.9794042137487843,
+  1.277757440202595
+ ],
+ "rows": [
+  {
+   "i": 0,
+   "z": 11.414997383752732,
+   "worst": "births",
+   "D": 0.0042080770545824394,
+   "rule": "tumor | oxygen increases cycle entry"
+  },
+  {
+   "i": 1,
+   "z": 62.529212200127716,
+   "worst": "live:tumor",
+   "D": 0.10698374193264072,
+   "rule": "tumor | pressure decreases cycle entry"
+  },
+  {
+   "i": 2,
+   "z": 223.811966148265,
+   "worst": "live:tumor",
+   "D": 0.8496897058873432,
+   "rule": "tumor | oxygen decreases necrosis"
+  },
+  {
+   "i": 3,
+   "z": 9.472296667781821,
+   "worst": "live:motile tumor",
+   "D": 0.5900106473149238,
+   "rule": "tumor | oxygen decreases transform to motile tumor"
+  },
+  {
+   "i": 4,
+   "z": 0.8287279428411355,
+   "worst": "live:motile tumor",
+   "D": 0.00016174032698962104,
+   "rule": "motile tumor | oxygen increases cycle entry"
+  },
+  {
+   "i": 5,
+   "z": 10.538813304518177,
+   "worst": "births",
+   "D": 0.012377716245141975,
+   "rule": "motile tumor | pressure decreases cycle entry"
+  },
+  {
+   "i": 6,
+   "z": 15.585347922243656,
+   "worst": "live:motile tumor",
+   "D": 0.10861828066949882,
+   "rule": "motile tumor | oxygen decreases necrosis"
+  },
+  {
+   "i": 7,
+   "z": 29.661370079617026,
+   "worst": "live:tumor",
+   "D": 0.0339531764279618,
+   "rule": "motile tumor | oxygen increases transform to tumor"
+  }
+ ]
+}
