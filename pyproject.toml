@@ -50,6 +50,12 @@ test-command = "python -c \"import pyphysicell, pyphysicell._kernels as k; print
 
 [tool.cibuildwheel.linux]
 archs = ["x86_64", "aarch64"]
+# NOT the manylinux2014 default: modern NumPy ships no wheel for glibc 2.17,
+# so pip builds it from source in the container and manylinux2014's GCC 10.2
+# is below NumPy's 10.3 floor. Our own wheel builds there fine; installing its
+# dependency is what fails.
+manylinux-x86_64-image = "manylinux_2_28"
+manylinux-aarch64-image = "manylinux_2_28"
 
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "arm64"]
