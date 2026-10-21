@@ -21,3 +21,6 @@ tests/biofvm_ref
 
 # scratch: the rule-importance study, kept locally
 experiments/
+
+wheelhouse/
+wheelhouse_repro/
