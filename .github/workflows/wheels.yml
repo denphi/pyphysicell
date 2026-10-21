@@ -44,7 +44,11 @@ jobs:
 
   publish:
     needs: [wheels, sdist]
-    if: startsWith(github.ref, 'refs/tags/v')
+    # 0.1.0 and 0.1.1 were uploaded from a laptop with an API token. This job
+    # stays off until a trusted publisher is registered on PyPI; set the repo
+    # variable PYPI_TRUSTED_PUBLISHING=true to turn it on, so a tag does not
+    # fail on OIDC that was never configured.
+    if: startsWith(github.ref, 'refs/tags/v') && vars.PYPI_TRUSTED_PUBLISHING == 'true'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
