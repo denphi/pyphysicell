@@ -5,6 +5,16 @@ from __future__ import annotations
 import numpy as np
 
 
+def _mpl_at_least(major: int, minor: int) -> bool:
+    import matplotlib
+
+    try:
+        parts = matplotlib.__version__.split(".")
+        return (int(parts[0]), int(parts[1])) >= (major, minor)
+    except (ValueError, IndexError):      # a dev or vendored version string
+        return True
+
+
 def plot_cells(sim, color_by: str = "cell_type", substrate: str | None = None, ax=None,
                show_dead: bool = True, cmap="YlOrRd", alpha=0.9):
     """A 2-D snapshot: substrate as a background image, cells as circles."""
@@ -35,9 +45,14 @@ def plot_cells(sim, color_by: str = "cell_type", substrate: str | None = None, a
         if show_dead:
             dead = c.view("dead") == 1
             colors[dead] = (0.25, 0.25, 0.25, 1.0)
+        # matplotlib renamed transOffset to offset_transform in 3.6, and the
+        # older one swallows the unknown keyword into **kwargs before failing
+        # in update() with an AttributeError, so this cannot be a try/except
+        # on TypeError. nanoHUB's default kernel still ships 3.5.
+        offset_kw = "offset_transform" if _mpl_at_least(3, 6) else "transOffset"
         coll = EllipseCollection(diam, diam, np.zeros(n), units="xy", offsets=pos[:, :2],
-                                 offset_transform=ax.transData, facecolors=colors,
-                                 edgecolors="k", linewidths=0.2, alpha=alpha)
+                                 facecolors=colors, edgecolors="k", linewidths=0.2,
+                                 alpha=alpha, **{offset_kw: ax.transData})
         ax.add_collection(coll)
     ax.set_xlim(d.x_min, d.x_max)
     ax.set_ylim(d.y_min, d.y_max)

@@ -1,6 +1,6 @@
 # pyphysicell: PhysiCell models in Python, with C++ only as computation kernels
 
-**Version:** 0.1.3
+**Version:** 0.1.4
 
 **Release date:** 22 October 2026
 

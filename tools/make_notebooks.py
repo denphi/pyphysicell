@@ -355,8 +355,11 @@ def build(project: Path, scenario: Path | None = None, label: str | None = None)
         code(f"before = sim.microenvironment[{sub0!r}].mean()\n"
              f"sim.microenvironment.density[..., 0] = 0.0      # remove {sub0} everywhere\n"
              f"sim.run(until=sim.t + {short:g}, record_every={record:g})\n"
-             f"print(f'mean {sub0} {{before:.3g}} -> "
-             f"{{sim.microenvironment[{sub0!r}].mean():.3g}}')\n"
+             # NOT an f-string holding the same quote it is delimited with:
+             # that is PEP 701, Python 3.12+, and these notebooks have to parse
+             # on 3.8 (nanoHUB's default kernel)
+             f"after = sim.microenvironment[{sub0!r}].mean()\n"
+             f"print(f'mean {sub0} {{before:.3g}} -> {{after:.3g}}')\n"
              "viz.plot_populations(sim.scalars)\n"
              "plt.axvline(sim.scalars.times[0] / 60, ls=':', c='k')\n"
              "plt.title('one simulation, perturbed part-way through');"),
