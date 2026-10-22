@@ -13,6 +13,7 @@ platform -- which is the difference between `pip install` working and not.
 import os
 
 from setuptools import Extension, setup
+from wheel.bdist_wheel import bdist_wheel
 from setuptools.command.build_ext import build_ext
 
 FLAGS = {
@@ -42,6 +43,12 @@ class BuildKernels(build_ext):
     def get_export_symbols(self, ext):
         return []
 
+    def get_ext_filename(self, name):
+        # drop the cpython-3XX tag: the file is found by glob, not imported
+        base = super().get_ext_filename(name)
+        root, ext = os.path.splitext(base)
+        return root.split(".")[0] + ext
+
     def build_extensions(self):
         flags = FLAGS.get(self.compiler.compiler_type, FLAGS["unix"])
         for ext in self.extensions:
@@ -55,7 +62,25 @@ class BuildKernels(build_ext):
                   f"*** Installing anyway; they will be compiled on first import.\n")
 
 
+class PlainTag(bdist_wheel):
+    """Tag the wheel py3-none-<platform>, not cp3XX-cp3XX-<platform>.
+
+    The kernels call no CPython API -- they are a plain shared library that
+    ctypes dlopens -- so one build serves every interpreter on a platform.
+    That turns a 4-versions x 7-platforms matrix into 7 wheels and covers
+    Python versions that did not exist when the wheel was built.
+    """
+
+    def finalize_options(self):
+        super().finalize_options()
+        self.root_is_pure = False          # platform-specific, but not ABI-specific
+
+    def get_tag(self):
+        _py, _abi, plat = super().get_tag()
+        return "py3", "none", plat
+
+
 setup(
-    cmdclass={"build_ext": BuildKernels},
+    cmdclass={"build_ext": BuildKernels, "bdist_wheel": PlainTag},
     ext_modules=[Extension("pyphysicell._pckernels", ["python/pyphysicell/kernels.cpp"])],
 )

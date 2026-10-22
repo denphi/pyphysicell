@@ -1,6 +1,6 @@
 # pyphysicell: PhysiCell models in Python, with C++ only as computation kernels
 
-**Version:** 0.1.2
+**Version:** 0.1.3
 
 **Release date:** 22 October 2026
 
@@ -210,7 +210,8 @@ tests/                          unit tests + the BioFVM golden test
 notebooks/01_rules_sample.ipynb the demo
 ```
 
-Requires Python ≥ 3.10, NumPy, a C++17 compiler; matplotlib and pandas for the notebook.
+Requires Python ≥ 3.8 and NumPy. The wheels carry the kernels prebuilt, so no compiler is
+needed unless you install from source; matplotlib and pandas are for the notebooks.
 
 ## Credit
 
