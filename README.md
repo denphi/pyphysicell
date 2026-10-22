@@ -1,8 +1,8 @@
 # pyphysicell: PhysiCell models in Python, with C++ only as computation kernels
 
-**Version:** 0.1.1
+**Version:** 0.1.2
 
-**Release date:** 20 October 2026
+**Release date:** 22 October 2026
 
 **Based on:** PhysiCell **1.14.2** (and the BioFVM vendored in it). This is the
 version every algorithm, default value and parity test here was written

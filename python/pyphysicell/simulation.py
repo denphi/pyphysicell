@@ -509,6 +509,9 @@ class Simulation:
             vel = c.velocity[:n]
         self._run_hooks("custom_rule", dt)
         self._update_motility(dt)
+        if self.fibres is not None and self.fibres.n:
+            # a cell held by the matrix gets one randomly redirected step
+            fibre_mod.forced_motility(self, dt)
         vel += c.motility_vector[:n]
         c.velocity[:n] = vel
         K.update_positions(c.position[:n], c.velocity[:n], c.prev_velocity[:n],

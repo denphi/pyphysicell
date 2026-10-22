@@ -575,6 +575,43 @@ cycle entry outweighs a transformation rate.
 is a property of a model *and a window*, never of a model. Anything the library reports about rule
 importance says over how long it looked.
 
+### ADR-023 — PhysiMeSS in full, including the parts its own config leaves off (2026-10-22)
+
+**What was missing.** ADR-018 built the geometry and the two force kernels, which is the half of
+PhysiMeSS that the `physimess` sample project exercises. The rest was absent, and absent silently,
+because that project ships with `fibre_pushing`, `fibre_rotation` and `fibre_degradation` all at
+`0.0` -- running it tests none of them. Now implemented:
+
+- the velocity-dependent fibre adhesion and contact repulsion (`vel_adhesion`, `vel_contact`,
+  `cell_velocity_max`), which hold a cell to a fibre it is already running along and slow one
+  crossing it. This was the larger half of `add_potentials_from_fibre` and we had only the first;
+- crosslinking proper -- all three of upstream's tests (colinear parallel, overlapping parallel,
+  skew intersection), the crosslink point, and the three regimes it selects: a free fibre is pushed
+  and turned about its centre, a fibre with one crosslink swings about that crosslink, one with two
+  or more is held;
+- fibre degradation by a stuck cell (`fibre_degradation`, `fibre_deg_rate`, `fibre_stuck`);
+- the stuck/unstuck counters, so a cell held by the matrix gets one randomly redirected step;
+- `assign_fibre_orientation` and `check_out_of_bounds`: per-fibre lengths drawn from a normal,
+  isotropic or `fibre_angle`-centred orientation, ten re-orientation attempts, then discard.
+
+**Two corrections to what was there.** `fibre_pushing` and `fibre_rotation` are read from the
+*cell* doing the pushing, not from the fibre, so they moved to per-cell arrays. And the port was
+defaulting both to 1.0 whenever the column was all zeros -- silently enabling behaviour the
+project's own config disables.
+
+**Deviations, all deliberate.** Upstream compares the centre-to-centre unit vector to the
+orientation with `==` on doubles, making crosslink test 1 effectively dead; test 2's condition
+parses as `a || b || c || (d && e && f)` rather than the grouping its layout suggests. Both are
+reproduced, because agreeing with PhysiCell 1.14.2 is the point. The 3-D bounds check, which
+compares z against the x bounds, is not reproduced: that one only discards valid fibres. Upstream
+degrades every fibre a stuck cell touches in a step; this degrades the closest. The 1.14.2 source
+reads `fibre_stuck_time` and `fibre_degradation_rate`, which no shipped XML defines -- the configs
+say `fibre_stuck` and `fibre_deg_rate` -- so both spellings are accepted.
+
+**Cost.** Crosslinks are recounted every mechanics step, as upstream does. An n^2 sweep at a few
+thousand fibres costs more than the rest of the time loop, so candidates are pruned by an x-sweep
+first: 2,000 fibres with 18,470 crosslinks between them take 43 ms.
+
 ## 5. Architecture
 
 ```

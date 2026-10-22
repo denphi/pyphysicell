@@ -60,9 +60,17 @@ def _compilers() -> list[str]:
 
 
 def _prebuilt() -> Path | None:
-    """The shared library a wheel ships, if this is an installed wheel."""
+    """The shared library a wheel ships, if this is an installed wheel.
+
+    A binary older than the source beside it is ignored. In a wheel the two
+    are built together and this never triggers; in an editable install it is
+    the difference between testing your edit to kernels.cpp and silently
+    testing the binary from last week.
+    """
     for pat in ("_pckernels*.so", "_pckernels*.dylib", "_pckernels*.pyd", "_pckernels*.dll"):
         for found in sorted(_HERE.glob(pat)):
+            if _SRC.exists() and _SRC.stat().st_mtime > found.stat().st_mtime + 1.0:
+                return None
             return found
     return None
 
@@ -130,8 +138,9 @@ def _bind(lib_path, tag):
         "pc_sample_at_cells": [_D, _D, c_long, _L, c_long, _D, _D],
         "pc_fibre_push_cells": [_D, _D, _D, _U, c_long, _D, _D, _D, _D, _D, c_long,
                                 c_double, c_double, c_double, c_double, c_long, c_long, c_long,
-                                _L, _L, c_int, _D, _D, _L],
-        "pc_cells_push_fibres": [_D, _D, _D, _D, _D, c_long, _D, _D, _D, _D, _D, _U, _U, _L,
+                                _L, _L, c_int, _D, _D, _D, _D, _D, _D, _D, _D, _L, _L, _D],
+        "pc_cells_push_fibres": [_D, _D, _D, _D, _D, c_long, _D, _D,
+                                 _D, _D, _D, _D, _D, _L,
                                  c_long, c_double, c_double, c_double, c_double,
                                  c_long, c_long, c_long, _L, _L, c_int, _D, _D, _D],
     }
@@ -228,22 +237,29 @@ def sample_at_cells(rho, grad, cell_voxel, out_rho, out_grad=None):
 
 
 def fibre_push_cells(cpos, cradius, crepulsion, cmovable, fpos, fdir, fhalf, frad, frep,
-                     origin, h, grid_shape, head, next_, is2d, velocity, pressure, contacts):
+                     origin, h, grid_shape, head, next_, is2d, cprev, crelmax, frelmax,
+                     cvel_adh, cvel_con, cvel_max, velocity, pressure, contacts,
+                     near_fibre, near_disp):
     x0, y0, z0 = origin
     gx, gy, gz = grid_shape
     _LIB.pc_fibre_push_cells(_d(cpos), _d(cradius), _d(crepulsion), _u(cmovable), cpos.shape[0],
                              _d(fpos), _d(fdir), _d(fhalf), _d(frad), _d(frep), fpos.shape[0],
                              x0, y0, z0, h, gx, gy, gz, _l(head), _l(next_), int(is2d),
-                             _d(velocity), _d(pressure), _l(contacts))
+                             _d(cprev), _d(crelmax), _d(frelmax),
+                             _d(cvel_adh), _d(cvel_con), _d(cvel_max),
+                             _d(velocity), _d(pressure), _l(contacts),
+                             _l(near_fibre), _d(near_disp))
 
 
-def cells_push_fibres(cpos, cradius, crepulsion, cspeed, csticky, fpos, fdir, fhalf, frad, frep,
-                      fpush, frotate, fcrosslinks, origin, h, grid_shape, head, next_, is2d,
+def cells_push_fibres(cpos, cradius, crepulsion, cspeed, csticky, cpush, crotate,
+                      fpos, fdir, fhalf, frad, frep, fcrosslinks,
+                      origin, h, grid_shape, head, next_, is2d,
                       fvelocity, fangle, fpressure):
     x0, y0, z0 = origin
     gx, gy, gz = grid_shape
     _LIB.pc_cells_push_fibres(_d(cpos), _d(cradius), _d(crepulsion), _d(cspeed), _d(csticky),
-                              cpos.shape[0], _d(fpos), _d(fdir), _d(fhalf), _d(frad), _d(frep),
-                              _u(fpush), _u(frotate), _l(fcrosslinks), fpos.shape[0],
+                              cpos.shape[0], _d(cpush), _d(crotate),
+                              _d(fpos), _d(fdir), _d(fhalf), _d(frad), _d(frep),
+                              _l(fcrosslinks), fpos.shape[0],
                               x0, y0, z0, h, gx, gy, gz, _l(head), _l(next_), int(is2d),
                               _d(fvelocity), _d(fangle), _d(fpressure))

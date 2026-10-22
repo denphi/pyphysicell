@@ -474,7 +474,10 @@ API void pc_fibre_push_cells(const double* cpos, const double* cradius, const do
                              const double* frad, const double* frep, long nfibres,
                              double x0, double y0, double z0, double h, long gx, long gy, long gz,
                              const long* head, const long* next, int is2d,
-                             double* velocity, double* pressure, long* contacts) {
+                             const double* cprev, const double* crelmax, const double* frelmax,
+                             const double* cvel_adh, const double* cvel_con, const double* cvel_max,
+                             double* velocity, double* pressure, long* contacts,
+                             long* near_fibre, double* near_disp) {
   const double simple_pressure_scale = 0.027288820670331;
   parallel_for(ncells, [&](long c) {
     if (!cmovable[c]) return;
@@ -482,6 +485,14 @@ API void pc_fibre_push_cells(const double* cpos, const double* cradius, const do
     grid_cell(cpos + c * 3, x0, y0, z0, h, gx, gy, gz, i, j, k);
     double vx = 0.0, vy = 0.0, vz = 0.0, press = 0.0;
     long touched = 0;
+    // the closest fibre this cell is touching, for the degradation decision
+    // Python makes afterwards (PhysiMeSS_Cell::degrade_fibre)
+    long best_f = -1;
+    double best_d = 1e300;
+    // |v_prev|, used by the velocity-dependent terms below
+    const double pvx = cprev[c * 3 + 0], pvy = cprev[c * 3 + 1], pvz = cprev[c * 3 + 2];
+    double speed = std::sqrt(pvx * pvx + pvy * pvy + pvz * pvz);
+    if (speed < 1e-8) speed = 1e-8;
     for (long kk = (k > 0 ? k - 1 : 0); kk <= (k + 1 < gz ? k + 1 : gz - 1); ++kk)
       for (long jj = (j > 0 ? j - 1 : 0); jj <= (j + 1 < gy ? j + 1 : gy - 1); ++jj)
         for (long ii = (i > 0 ? i - 1 : 0); ii <= (i + 1 < gx ? i + 1 : gx - 1); ++ii)
@@ -501,22 +512,50 @@ API void pc_fibre_push_cells(const double* cpos, const double* cradius, const do
             vy += temp_r * disp[1];
             vz += temp_r * disp[2];
             ++touched;
+
+            // PhysiMeSS adds a velocity-dependent adhesion along the fibre and
+            // a contact repulsion against the direction of travel. xi is how
+            // aligned the cell's motion already is with the fibre, so a cell
+            // running along a fibre is held to it and one crossing it is
+            // slowed. Reached only when d <= R: upstream returns before this
+            // whenever the repulsion term vanishes.
+            const double maxint = crelmax[c] * cradius[c] + frelmax[f] * frad[f];
+            if (d < maxint) {
+              const double along = fdir[f * 3 + 0] * pvx + fdir[f * 3 + 1] * pvy
+                                 + fdir[f * 3 + 2] * pvz;
+              const double xi = std::fabs(along) / speed;        // p = q = 1
+              const double adh = cvel_adh[c] * xi * (1.0 - speed / cvel_max[c]);
+              const double rep = cvel_con[c] * (1.0 - xi * xi);
+              vx += adh * fdir[f * 3 + 0] - rep * pvx;
+              vy += adh * fdir[f * 3 + 1] - rep * pvy;
+              vz += adh * fdir[f * 3 + 2] - rep * pvz;
+              if (d < best_d) { best_d = d; best_f = f; }
+            }
           }
     velocity[c * 3 + 0] += vx;
     velocity[c * 3 + 1] += vy;
     if (!is2d) velocity[c * 3 + 2] += vz;
     pressure[c] += press;
     contacts[c] += touched;
+    near_fibre[c] = best_f;
+    if (best_f >= 0) {
+      double disp[3];
+      nearest_on_fibre(cpos + c * 3, fpos + best_f * 3, fdir + best_f * 3, fhalf[best_f], disp);
+      near_disp[c * 3 + 0] = disp[0];
+      near_disp[c * 3 + 1] = disp[1];
+      near_disp[c * 3 + 2] = disp[2];
+    }
   });
 }
 
 // Pass 2: cells push and turn fibres.  Parallel over fibres; `head`/`next`
-// index cells.  `push` and `rotate` are per-fibre flags, `sticky` per cell.
+// index cells.  push, rotate and sticky are all properties of the *cell*
+// doing the pushing, which is where PhysiMeSS reads them from.
 API void pc_cells_push_fibres(const double* cpos, const double* cradius, const double* crepulsion,
                               const double* cspeed, const double* csticky, long ncells,
+                              const double* cpush, const double* crotate,
                               const double* fpos, const double* fdir, const double* fhalf,
                               const double* frad, const double* frep,
-                              const unsigned char* fpush, const unsigned char* frotate,
                               const long* fcrosslinks, long nfibres,
                               double x0, double y0, double z0, double h, long gx, long gy, long gz,
                               const long* head, const long* next, int is2d,
@@ -526,7 +565,12 @@ API void pc_cells_push_fibres(const double* cpos, const double* cradius, const d
     long i, j, k;
     grid_cell(fpos + f * 3, x0, y0, z0, h, gx, gy, gz, i, j, k);
     double vx = 0.0, vy = 0.0, vz = 0.0, angle = 0.0, press = 0.0;
-    const bool crosslinked = fcrosslinks[f] != 0;
+    // PhysiMeSS has three regimes, not two: a free fibre is pushed and turned
+    // about its own centre, a fibre with one crosslink only turns (about that
+    // crosslink, which Python applies), and a fibre with two or more is held.
+    const long xl = fcrosslinks[f];
+    if (xl >= 2) return;
+    const bool free_fibre = (xl == 0);
     for (long kk = (k > 0 ? k - 1 : 0); kk <= (k + 1 < gz ? k + 1 : gz - 1); ++kk)
       for (long jj = (j > 0 ? j - 1 : 0); jj <= (j + 1 < gy ? j + 1 : gy - 1); ++jj)
         for (long ii = (i > 0 ? i - 1 : 0); ii <= (i + 1 < gx ? i + 1 : gx - 1); ++ii)
@@ -540,7 +584,7 @@ API void pc_cells_push_fibres(const double* cpos, const double* cradius, const d
             temp_r *= temp_r;
             press += temp_r / simple_pressure_scale;
 
-            if (fpush[f] && !crosslinked) {
+            if (cpush[c] > 0.5 && free_fibre) {
               double push = temp_r * std::sqrt(crepulsion[c] * frep[f]);
               if (std::fabs(push) >= 1e-16) {
                 push /= d;
@@ -549,7 +593,7 @@ API void pc_cells_push_fibres(const double* cpos, const double* cradius, const d
                 vz -= push * disp[2];
               }
             }
-            if (frotate[f] && !crosslinked) {
+            if (crotate[c] > 0.5) {
               // the impact point is the cell's position minus the displacement
               const double ix = cpos[c * 3 + 0] - disp[0] - fpos[f * 3 + 0];
               const double iy = cpos[c * 3 + 1] - disp[1] - fpos[f * 3 + 1];

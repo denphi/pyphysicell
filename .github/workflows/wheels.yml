@@ -3,6 +3,9 @@ name: wheels
 on:
   push:
     tags: ["v*"]
+    branches: ["main"]
+    paths: ["python/pyphysicell/kernels.cpp", "python/pyphysicell/_kernels.py",
+            "setup.py", "pyproject.toml", ".github/workflows/wheels.yml"]
   workflow_dispatch:
   pull_request:
     paths: ["python/pyphysicell/kernels.cpp", "setup.py", "pyproject.toml", ".github/workflows/wheels.yml"]

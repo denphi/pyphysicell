@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from .. import fibres as fibre_mod
 from ..fibres import Fibres, is_fibre_type
 
 
@@ -36,6 +37,7 @@ def seed(sim) -> str:
 
     sim.fibres = Fibres()
     n_fibres = int(p.get("number_of_fibres", 0))
+    dropped = 0
     if n_fibres and fibre_types:
         name = fibre_types[0]
         ct = m.cell_type(name)
@@ -44,30 +46,34 @@ def seed(sim) -> str:
             sim.rng.uniform(d.x_min, d.x_max, n_fibres),
             sim.rng.uniform(d.y_min, d.y_max, n_fibres),
             np.zeros(n_fibres) if d.use_2D else sim.rng.uniform(d.z_min, d.z_max, n_fibres)])
-        theta = sim.rng.uniform(0.0, 2.0 * np.pi, n_fibres)
-        if d.use_2D:
-            dirs = np.column_stack([np.cos(theta), np.sin(theta), np.zeros(n_fibres)])
-        else:
-            dirs = sim.rng.normal(size=(n_fibres, 3))
-        length = float(ct.custom_data.get("fibre_length", p.get("fibre_length", 75.0)))
-        radius = float(ct.custom_data.get("fibre_radius", p.get("fibre_radius", 2.0)))
-        sim.fibres.add(centres, dirs, half_length=0.5 * length, radius=radius,
-                       repulsion=ct.mechanics.cell_cell_repulsion_strength,
-                       type_idx=sim.type_index[name])
+        # assign_fibre_orientation + check_out_of_bounds: lengths drawn per
+        # fibre, orientation isotropic or around fibre_angle, and anything
+        # still sticking out of the domain after ten tries is discarded
+        centres, dirs, half, radius, dropped = fibre_mod.place(m, ct, centres, sim.rng, name)
+        if len(centres):
+            sim.fibres.add(centres, dirs, half_length=half, radius=radius,
+                           repulsion=ct.mechanics.cell_cell_repulsion_strength,
+                           rel_max_adh=ct.mechanics.relative_maximum_adhesion_distance,
+                           type_idx=sim.type_index[name])
     note = (" [the project's own config has number_of_cells=0; its scenarios live in "
             "config/<scenario>/*.csv, so these cells are a stand-in]" if substituted else "")
+    lost = f", {dropped} dropped for leaving the domain" if dropped else ""
     return (f"{sim.cells.n} cells and {sim.fibres.n} fibres "
-            f"(length {float(p.get('fibre_length', 75.0)):g} um){note}")
+            f"(length {float(p.get('fibre_length', 75.0)):g} um{lost}){note}")
 
 
 def install(sim) -> str:
-    # PhysiMeSS's per-cell switches; defaults match its config
+    """PhysiMeSS reads its switches from the cell doing the pushing.
+
+    They are left exactly as the XML sets them. An earlier version of this port
+    defaulted `fibre_pushing` and `fibre_rotation` to 1.0 whenever the column
+    was all zeros, which silently turned on behaviour the project's own config
+    turns off.
+    """
     c = sim.cells
-    for key, default in (("fibre_pushing", 1.0), ("fibre_rotation", 1.0),
-                         ("fibre_sticky", 1.0)):
-        if key in c.custom_names and not c.custom[: c.n, c.custom_names.index(key)].any():
-            c.custom[: c.n, c.custom_names.index(key)] = default
-    if sim.fibres is not None:
-        push = any("fibre_pushing" in ct.custom_data for ct in sim.model.cell_types)
-        sim.fibres.push[: sim.fibres.n] = 1 if push or True else 0
-    return "cell-fibre mechanics through the fibre kernels"
+    on = [k for k in ("fibre_pushing", "fibre_rotation", "fibre_degradation")
+          if k in c.custom_names and c.n
+          and float(c.custom[: c.n, c.custom_names.index(k)].max()) > 0.5]
+    return ("cell-fibre mechanics through the fibre kernels"
+            + (f"; enabled by the config: {', '.join(on)}" if on else
+               "; the config leaves pushing, rotation and degradation off"))
